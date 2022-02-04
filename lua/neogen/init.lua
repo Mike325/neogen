@@ -275,23 +275,12 @@ end
 
 -- Expose more API  ============================================================
 
--- Expose match_commands for `:Neogen` completion
+-- Expose completion functions
 neogen.match_commands = helpers.match_commands
+neogen.get_convention_names = helpers.get_convention_names
 
---- Get a template for a particular filetype
----@param filetype string
----@return neogen.TemplateConfig|nil
-neogen.get_template = function(filetype)
-    if not neogen.configuration.languages[filetype] then
-        return
-    end
-
-    if not neogen.configuration.languages[filetype].template then
-        return
-    end
-
-    return neogen.configuration.languages[filetype].template
-end
+neogen.get_template = helpers.get_templates
+neogen.set_ft_convention = helpers.set_ft_convention
 
 -- Required for use with completion engine =====================================
 
@@ -325,6 +314,10 @@ end
 function neogen.generate_command()
     vim.api.nvim_command(
         'command! -nargs=? -complete=customlist,v:lua.neogen.match_commands -range -bar Neogen lua require("neogen").generate({ type = <q-args>})'
+    )
+
+    vim.api.nvim_command(
+        'command! -nargs=1 -complete=customlist,v:lua.neogen.get_convention_names -range -bar NeogenUseConvention lua require("neogen").set_ft_convention (<q-args>)'
     )
 end
 
